@@ -1,54 +1,59 @@
 package com.example.bookstore_backend.service.impl;
 
 import com.example.bookstore_backend.Constants.CONSTANTS;
-import com.example.bookstore_backend.dto.ResponseDto;
 import com.example.bookstore_backend.dto.UserDto;
 import com.example.bookstore_backend.model.User;
-import com.example.bookstore_backend.repository.impl.UserRepositoryImpl;
+import com.example.bookstore_backend.repository.UserRepository;
 import com.example.bookstore_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
-    UserRepositoryImpl userRepositoryImpl;
+    UserRepository userRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepositoryImpl userRepositoryImpl){
-        this.userRepositoryImpl = userRepositoryImpl;
+    public UserServiceImpl(UserRepository userRepository){
+        this.userRepository = userRepository;
     }
 
     @Override
-    public UserDto loginRequest(String username, String password) {
-        return userRepositoryImpl.userInfoValidation(username, password);
+    public Optional<UserDto> loginRequest(String username, String password) {
+        return userRepository.userInfoValidation(username, password);
     }
 
     @Override
-    public UserDto insertUserInfo(User user) {
+    public void insertUserInfo(User user) {
         user.setAvatar(CONSTANTS.defaultAvatar);
         user.setRemainMoney(CONSTANTS.defaultMoney);
-        userRepositoryImpl.save(user);
-        return null;
+        userRepository.save(user);
     }
 
     @Override
-    public UserDto getUserByUid(Integer uid) {
-        return mapToUserDto(userRepositoryImpl.getUserByUid(uid));
+    public UserDto getUserByUid(Long uid) {
+        Optional<User> user = userRepository.getUserByUid(uid);
+        return user.map(UserServiceImpl::mapToUserDto).orElse(null);
     }
 
+
+    //Long uid, String slogan, String username, String avatar, Integer remainMoney
     @Override
     public UserDto updateUserInfo(UserDto user) {
         try {
-            userRepositoryImpl.updateUserInfo(user);
+            userRepository.PrivateSave(user.getUid(), user.getSlogan(), user.getUsername(), user.getAvatar(), user.getRemainMoney());
         }catch(Exception e){
             if(e.getMessage().contains("Duplicate entry")){
                 return null;
             }
         }
         return user;
+    }
+
+    @Override
+    public Boolean decreaseMoney(Long uid, Double spend) {
+        return userRepository.decreaseMoney(uid, spend) == 1;
     }
 
     private static UserDto mapToUserDto(User user){
@@ -60,4 +65,5 @@ public class UserServiceImpl implements UserService {
                 .uid(user.getUid())
                 .build();
     }
+
 }

@@ -1,5 +1,6 @@
 package com.example.bookstore_backend.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,13 +12,22 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
+@Table(name = "orderbooks")
+@Entity
 public class OrderBook{
-    Integer oid;
-    Integer uid;
-    Integer bid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long oid;
+
+
+    Long uid;
+
+    Long bid;
     LocalDateTime dateTime;
     Double totalPrice;
     String address;
     String telephone;
     Integer number;
+    String name;
 }

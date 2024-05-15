@@ -3,8 +3,7 @@ package com.example.bookstore_backend.controller;
 import com.example.bookstore_backend.dto.CartBookDto;
 import com.example.bookstore_backend.dto.ResponseDto;
 import com.example.bookstore_backend.model.CartBook;
-import com.example.bookstore_backend.repository.CartbookRepository;
-import com.example.bookstore_backend.repository.impl.CartbookRepositoryImpl;
+import com.example.bookstore_backend.service.CartService;
 import com.example.bookstore_backend.service.impl.CartServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +13,14 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/cart")
 public class CartBookController {
-    CartServiceImpl cartService;
+    CartService cartService;
     @Autowired
-    public CartBookController(CartServiceImpl cartService){
+    public CartBookController(CartService cartService){
         this.cartService = cartService;
     }
 
     @GetMapping("/items/{userId}")
-    public ResponseDto<List<CartBookDto>> getCartItemByUid(@PathVariable Integer userId){
+    public ResponseDto<List<CartBookDto>> getCartItemByUid(@PathVariable Long userId){
         List<CartBookDto> list = cartService.getCartItemByUid(userId);
         if(!list.isEmpty()){
             return new ResponseDto<>(true, "Operation OK", list);
@@ -43,7 +42,7 @@ public class CartBookController {
     }
 
     @DeleteMapping("/deleteItem/{cid}")
-    public ResponseDto<Boolean> deleteCartItemInfo(@PathVariable Integer cid){
+    public ResponseDto<Boolean> deleteCartItemInfo(@PathVariable Long cid){
         cartService.deleteCartItem(cid);
         return new ResponseDto<>(true, "Operation OK", true);
     }

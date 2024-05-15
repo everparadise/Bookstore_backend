@@ -45,7 +45,7 @@ create table orderbooks
     totalPrice double      null,
     address    varchar(64) null,
     telephone  varchar(20) null,
-    receiver varchar(20) null,
+    name varchar(20) null,
     constraint order_user_uid
         foreign key (uid) references users (uid),
     constraint  order_books_bid

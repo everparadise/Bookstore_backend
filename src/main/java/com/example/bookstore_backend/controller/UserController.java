@@ -4,22 +4,25 @@ import com.example.bookstore_backend.Constants.CONSTANTS;
 import com.example.bookstore_backend.dto.ResponseDto;
 import com.example.bookstore_backend.dto.UserDto;
 import com.example.bookstore_backend.model.User;
+import com.example.bookstore_backend.service.UserService;
 import com.example.bookstore_backend.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/v1/user")
 public class UserController {
-    UserServiceImpl userServiceImpl;
+    UserService userServiceImpl;
 
     @Autowired
-    public UserController(UserServiceImpl userServiceImpl){
+    public UserController(UserService userServiceImpl){
         this.userServiceImpl = userServiceImpl;
     }
 
     @GetMapping("/getUser/{uid}")
-    public ResponseDto<UserDto> getUserByUid(@PathVariable Integer uid){
+    public ResponseDto<UserDto> getUserByUid(@PathVariable Long uid){
         UserDto user = userServiceImpl.getUserByUid(uid);
         if(user != null){
             return new ResponseDto<>(true, "Operation OK", user);
@@ -30,9 +33,9 @@ public class UserController {
     @PostMapping("/loginRequest")
     public ResponseDto<UserDto> loginRequest(@RequestBody User user){
 
-        UserDto dto = userServiceImpl.loginRequest(user.getUsername(), user.getPassword());
-        if(dto != null){
-            return new ResponseDto<>(true, "login Success", dto);
+        Optional<UserDto> dto = userServiceImpl.loginRequest(user.getUsername(), user.getPassword());
+        if(dto.isPresent()){
+            return new ResponseDto<>(true, "login Success", dto.get());
         }
         else return new ResponseDto<>(false, "login Failed", null);
     }

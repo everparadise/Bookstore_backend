@@ -2,24 +2,30 @@ package com.example.bookstore_backend.service.impl;
 
 import com.example.bookstore_backend.dto.BookDto;
 import com.example.bookstore_backend.model.Book;
-import com.example.bookstore_backend.repository.impl.BookRepositoryImpl;
+import com.example.bookstore_backend.repository.BookRepository;
 import com.example.bookstore_backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
-    BookRepositoryImpl bookRepository;
+    BookRepository bookRepository;
     @Autowired
-    public BookServiceImpl(BookRepositoryImpl bookRepository){
+    public BookServiceImpl(BookRepository bookRepository){
         this.bookRepository = bookRepository;
     }
 
     @Override
     public List<BookDto> getBooksByPage(Integer page) {
-        return bookRepository.getBookByPageNumber(page);
+
+        Pageable pageable = PageRequest.of(page * 12, (page + 1) * 12, Sort.by(Sort.Direction.ASC, "bid"));
+        return bookRepository.getBooksByPageable(pageable);
     }
 
     @Override
@@ -28,29 +34,30 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book getBookByBid(Integer bid) {
+    public Optional<Book> getBookByBid(Long bid) {
         return bookRepository.getBookByBid(bid);
     }
 
     @Override
     public Boolean addBookInfo(Book book){
-        bookRepository.AddBookInfo(book);
+        bookRepository.save(book);
         return true;
     }
 
     @Override
     public List<BookDto> getBooksByRanks(Integer number) {
-        return bookRepository.getBooksByRanks(number).stream().map(BookServiceImpl::mapToBookDto).toList();
+        Pageable pageable = PageRequest.of(0, number, Sort.by(Sort.Direction.DESC, "sales"));
+        return bookRepository.getBooksByPageable(pageable);
     }
 
     @Override
-    public Boolean increaseBookSales(Integer bid, Integer increase) {
+    public Boolean increaseBookSales(Long bid, Integer increase) {
         bookRepository.increaseBookSales(bid, increase);
         return true;
     }
 
     @Override
-    public Boolean deleteBookByBid(Integer bid) {
+    public Boolean deleteBookByBid(Long bid) {
         bookRepository.deleteBookByBid(bid);
         return true;
     }

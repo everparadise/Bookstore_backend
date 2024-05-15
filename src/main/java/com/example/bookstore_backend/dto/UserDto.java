@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-    private Integer uid;
+    private Long uid;
     private String username;
     private Double remainMoney;
     private String slogan;

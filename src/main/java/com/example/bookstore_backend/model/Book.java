@@ -1,5 +1,6 @@
 package com.example.bookstore_backend.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
+@Table(name = "books")
+@Entity
 public class Book {
-    Integer bid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long bid;
     String name;
     String pic;
     String comment;

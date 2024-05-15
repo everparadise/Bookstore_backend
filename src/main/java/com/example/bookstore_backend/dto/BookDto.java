@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDto {
-    private Integer bid;
+    private Long bid;
     private String pic;
     private String name;
     private Double price;

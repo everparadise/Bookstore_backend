@@ -6,6 +6,6 @@ import com.example.bookstore_backend.model.OrderBook;
 import java.util.List;
 
 public interface OrderService {
-    public Boolean AddOrderItemInfo(OrderBook order);
-    public List<OrderBookDto> GetOrderByUid(Integer uid);
+    public OrderBook AddOrderItemInfo(OrderBook order);
+    public List<OrderBookDto> GetOrderByUid(Long uid);
 }

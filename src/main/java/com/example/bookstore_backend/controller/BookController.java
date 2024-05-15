@@ -4,21 +4,22 @@ import com.example.bookstore_backend.Constants.CONSTANTS;
 import com.example.bookstore_backend.dto.BookDto;
 import com.example.bookstore_backend.dto.ResponseDto;
 import com.example.bookstore_backend.model.Book;
-import com.example.bookstore_backend.repository.impl.BookRepositoryImpl;
+import com.example.bookstore_backend.service.BookService;
 import com.example.bookstore_backend.service.impl.BookServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("v1/book")
 public class BookController {
-    BookServiceImpl bookServiceImpl;
+    BookService bookServiceImpl;
 
     @Autowired
-    public BookController(BookServiceImpl bookServiceImpl){
+    public BookController(BookService bookServiceImpl){
         this.bookServiceImpl = bookServiceImpl;
     }
 
@@ -37,10 +38,10 @@ public class BookController {
     }
 
     @GetMapping("book/{bid}")
-    public ResponseDto<Book> getBookByBid(@PathVariable Integer bid){
-        Book book = bookServiceImpl.getBookByBid(bid);
-        if(book != null){
-            return new ResponseDto<>(true, "Operation OK", book);
+    public ResponseDto<Book> getBookByBid(@PathVariable Long bid){
+        Optional<Book> book = bookServiceImpl.getBookByBid(bid);
+        if(book.isPresent()){
+            return new ResponseDto<>(true, "Operation OK", book.get());
         }
         else return new ResponseDto<>(false, "bid {%d} book not found".formatted(bid), null);
     }
@@ -63,7 +64,7 @@ public class BookController {
     }
 
     @DeleteMapping("delete/{bid}")
-    public ResponseDto<Boolean> deleteBookByBid(@PathVariable Integer bid){
+    public ResponseDto<Boolean> deleteBookByBid(@PathVariable Long bid){
         bookServiceImpl.deleteBookByBid(bid);
         return new ResponseDto<>(true, "Operation OK", true);
     }
