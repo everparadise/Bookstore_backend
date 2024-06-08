@@ -13,6 +13,6 @@ public class BookDto {
     private Long bid;
     private String pic;
     private String name;
-    private Double price;
+    private Integer price;
     private Integer sales;
 }

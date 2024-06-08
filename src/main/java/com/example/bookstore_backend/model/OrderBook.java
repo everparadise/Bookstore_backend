@@ -1,5 +1,6 @@
 package com.example.bookstore_backend.model;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,14 +21,14 @@ public class OrderBook{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long oid;
 
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", referencedColumnName = "Oid")
+    private Order order;
 
-    Long uid;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Book book;
 
-    Long bid;
-    LocalDateTime dateTime;
-    Double totalPrice;
-    String address;
-    String telephone;
-    Integer number;
-    String name;
+    @Column(nullable = false)
+    private Integer number;
 }

@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 public class UserDto {
     private Long uid;
     private String username;
-    private Double remainMoney;
+    private Integer remainMoney;
     private String slogan;
     private String avatar;
+
 }

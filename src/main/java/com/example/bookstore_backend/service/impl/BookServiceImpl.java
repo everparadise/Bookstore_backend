@@ -1,74 +1,99 @@
 package com.example.bookstore_backend.service.impl;
 
-import com.example.bookstore_backend.dto.BookDto;
+import com.example.bookstore_backend.dao.BookDao;
+import com.example.bookstore_backend.dao.OrderDao;
+import com.example.bookstore_backend.dto.*;
 import com.example.bookstore_backend.model.Book;
-import com.example.bookstore_backend.repository.BookRepository;
+import com.example.bookstore_backend.dao.OrderDao;
 import com.example.bookstore_backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
-    BookRepository bookRepository;
+    BookDao bookDao;
+    OrderDao orderDao;
     @Autowired
-    public BookServiceImpl(BookRepository bookRepository){
-        this.bookRepository = bookRepository;
+    public BookServiceImpl(BookDao bookDao, OrderDao orderDao){
+        this.bookDao = bookDao;
+        this.orderDao = orderDao;
     }
 
     @Override
-    public List<BookDto> getBooksByPage(Integer page) {
+    public Page<BookDto> getBooks(Integer page, String value) {
+        if(value == null) value = "";
+        return bookDao.getBooks(page, value);
+    }
 
-        Pageable pageable = PageRequest.of(page * 12, (page + 1) * 12, Sort.by(Sort.Direction.ASC, "bid"));
-        return bookRepository.getBooksByPageable(pageable);
+    @Override
+    public Page<ExtendBookDto> getExtendBooks(Integer page, String value) {
+        if(value == null) value = "";
+        return bookDao.getExtendBooks(page, value);
+
     }
 
     @Override
     public Integer getBooksPages() {
-        return bookRepository.getBooksPages();
+        return bookDao.getBooksPage();
     }
 
     @Override
     public Optional<Book> getBookByBid(Long bid) {
-        return bookRepository.getBookByBid(bid);
+        return bookDao.getBookByBid(bid);
     }
 
     @Override
-    public Boolean addBookInfo(Book book){
-        bookRepository.save(book);
-        return true;
+    public void addBookInfo(Book book){
+        bookDao.save(book);
+    }
+
+
+    @Override
+    public Integer deleteBookByBid(Long bid) {
+        return bookDao.deleteBookByBid(bid);
     }
 
     @Override
-    public List<BookDto> getBooksByRanks(Integer number) {
-        Pageable pageable = PageRequest.of(0, number, Sort.by(Sort.Direction.DESC, "sales"));
-        return bookRepository.getBooksByPageable(pageable);
+    public Boolean modifyBookPic(String pic, Long bid) {
+        return bookDao.modifyBookPic(pic, bid) != 0;
     }
 
     @Override
-    public Boolean increaseBookSales(Long bid, Integer increase) {
-        bookRepository.increaseBookSales(bid, increase);
-        return true;
+    public Integer modifyBookInfo(ExtendBookDto dto) {
+        return bookDao.modifyBookInfo(dto.getBid(), dto.getName(), dto.getAuthor(), dto.getPic(), dto.getIsbn(), dto.getStock(), dto.getComment());
     }
 
     @Override
-    public Boolean deleteBookByBid(Long bid) {
-        bookRepository.deleteBookByBid(bid);
-        return true;
+    public List<BookSalesDto> getRanking(String startString, String endString, Integer limit, Long uid) {
+        LocalDateTime startTime, endTime;
+        if(startString == null || startString.isEmpty()){
+            startTime = LocalDateTime.of(1973, 1, 1, 0, 0, 0);
+        }
+        else startTime = LocalDateTime.parse(startString,DateTimeFormatter.ISO_DATE_TIME);
+
+        if(startString == null || startString.isEmpty()){
+            endTime = LocalDateTime.now();
+        }
+        else endTime = LocalDateTime.parse(startString, DateTimeFormatter.ISO_DATE_TIME);
+
+        Page<BookSalesDto> salesDto = orderDao.getBookByRangingAndUid(startTime, endTime, limit, uid);
+        return salesDto.getContent();
     }
 
-    private static BookDto mapToBookDto(Book book){
+    private static BookDto mapToBookDto(ExtendBookDto extendBook){
         return BookDto.builder()
-                .bid(book.getBid())
-                .pic(book.getPic())
-                .price(book.getPrice())
-                .name(book.getName())
-                .sales(book.getSales())
+                .bid(extendBook.getBid())
+                .pic(extendBook.getPic())
+                .price(extendBook.getPrice())
+                .name(extendBook.getName())
+                .sales(extendBook.getSales())
                 .build();
 
     }

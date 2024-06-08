@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+//used for passing orderInfo to frontend
 public class OrderBookDto {
     private String address;
     private Integer number;

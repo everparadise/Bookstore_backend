@@ -16,9 +16,8 @@ public class CartBookDto {
     private Long bid;
     private Long uid;
     private String name;
-    private Double price;
+    private Integer price;
     private String pic;
     private String comment;
     private Integer number;
-    private Boolean selected;
 }

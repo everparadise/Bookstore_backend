@@ -1,0 +1,51 @@
+package com.example.bookstore_backend.util;
+
+import com.example.bookstore_backend.model.AuthUser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+// 对用户密码进行加密 并进行登录验证
+@Component
+public class AuthProvider implements AuthenticationProvider {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    /* self-defined auth logic */
+    @Override
+    public Authentication authenticate(Authentication authenticationToken)
+            throws AuthenticationException {
+        String uid = String.valueOf(authenticationToken.getPrincipal());
+        String password = String.valueOf(authenticationToken.getCredentials());
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(uid);
+        if (passwordEncoder.matches(password, userDetails.getPassword())) {
+            /* password match */
+            return new UsernamePasswordAuthenticationToken(uid, password, userDetails.getAuthorities());
+        }
+
+        /* password mismatch */
+        throw new BadCredentialsException("Invalid password");
+    }
+
+    /* reflection: make sure to support */
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return UsernamePasswordAuthenticationToken.class.equals(authentication);
+    }
+
+
+}

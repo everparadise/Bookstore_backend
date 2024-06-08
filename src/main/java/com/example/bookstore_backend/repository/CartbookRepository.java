@@ -4,12 +4,13 @@ import com.example.bookstore_backend.model.CartBook;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 
 public interface CartbookRepository extends JpaRepository<CartBook, Long> {
-    List<CartBook> getCartbookByUid(Long uid);
+    List<CartBook> findByUser_Uid(Long uid);
 
     @Modifying
     @Transactional

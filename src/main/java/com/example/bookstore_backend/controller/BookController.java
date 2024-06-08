@@ -1,16 +1,15 @@
 package com.example.bookstore_backend.controller;
 
-import com.example.bookstore_backend.Constants.CONSTANTS;
-import com.example.bookstore_backend.dto.BookDto;
-import com.example.bookstore_backend.dto.ResponseDto;
+import com.example.bookstore_backend.Constants.Role;
+import com.example.bookstore_backend.dto.*;
 import com.example.bookstore_backend.model.Book;
 import com.example.bookstore_backend.service.BookService;
-import com.example.bookstore_backend.service.impl.BookServiceImpl;
+import com.example.bookstore_backend.util.UserProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,21 +22,28 @@ public class BookController {
         this.bookServiceImpl = bookServiceImpl;
     }
 
-    @GetMapping("books/{page}")
-    public ResponseDto<List<BookDto>> getBooksByPageNumber(@PathVariable Integer page){
-        List<BookDto> list = bookServiceImpl.getBooksByPage(page);
-        if(!list.isEmpty()){
-            return new ResponseDto<>(true, "Operation OK", list);
+    @PostMapping("books")
+    public ResponseDto<SimplifiedPageDto<?>> getBooksByPageNumber(@RequestBody BookRequest request){
+        Page<?> pages;
+        Role role = UserProvider.getUserRole();
+        if(role.equals(Role.ADMIN)){
+            pages = bookServiceImpl.getExtendBooks(request.getPage(), request.getValue());
         }
-        return new ResponseDto<>(false, "Operation failure", null);
-    }
+        else{
+            pages = bookServiceImpl.getBooks(request.getPage(), request.getValue());
+        }
+        return new ResponseDto<>(true, role.toString() , new SimplifiedPageDto<>(
+                pages.getContent(),
+                pages.getTotalPages(),
+                (int) pages.getTotalElements()));
+        }
 
     @GetMapping("booksPages")
     public ResponseDto<Integer> getBooksNumbers(){
         return new ResponseDto<>(true, "Operation OK", bookServiceImpl.getBooksPages());
     }
 
-    @GetMapping("book/{bid}")
+    @GetMapping("{bid}")
     public ResponseDto<Book> getBookByBid(@PathVariable Long bid){
         Optional<Book> book = bookServiceImpl.getBookByBid(bid);
         if(book.isPresent()){
@@ -46,7 +52,7 @@ public class BookController {
         else return new ResponseDto<>(false, "bid {%d} book not found".formatted(bid), null);
     }
 
-    @PostMapping("addBook")
+    @PostMapping
     public ResponseDto<Boolean> addBookInfo(@RequestBody Book book){
         //根据isbn号去重
         book.setSales(0);
@@ -54,16 +60,22 @@ public class BookController {
         return new ResponseDto<>(true, "Operation OK", true);
     }
 
-    @GetMapping("ranking")
-    public ResponseDto<List<BookDto>> getTopRankBooks(@RequestParam(value = "number",defaultValue = "10") Integer number ){
-        List<BookDto> list = bookServiceImpl.getBooksByRanks(number);
-        if(!list.isEmpty()){
-            return new ResponseDto<>(true, "Operation OK", list);
-        }
-        else return new ResponseDto<>(false, "search failure", null);
+    @PutMapping
+    public ResponseDto<?> modifyBookInfo(@RequestBody ExtendBookDto bookDto){
+        Integer result = bookServiceImpl.modifyBookInfo(bookDto);
+        if(result != 0)
+            return new ResponseDto<>(true, "Operation OK", bookDto);
+        else return new ResponseDto<>(false, "Update Fault", null);
     }
 
-    @DeleteMapping("delete/{bid}")
+    @PutMapping("pic/{pic}/{bid}")
+    public ResponseDto<Boolean> modifyBookPic(@PathVariable String pic, @PathVariable Long bid){
+        if(bookServiceImpl.modifyBookPic(pic, bid)){
+            return new ResponseDto<>(true, "Operation OK", true);
+        }else return new ResponseDto<>(false, "bid not found", false);
+    }
+
+    @DeleteMapping("{bid}")
     public ResponseDto<Boolean> deleteBookByBid(@PathVariable Long bid){
         bookServiceImpl.deleteBookByBid(bid);
         return new ResponseDto<>(true, "Operation OK", true);

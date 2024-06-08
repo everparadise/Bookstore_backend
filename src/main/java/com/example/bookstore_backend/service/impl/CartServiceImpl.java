@@ -1,6 +1,10 @@
 package com.example.bookstore_backend.service.impl;
 
+import com.example.bookstore_backend.dao.BookDao;
+import com.example.bookstore_backend.dao.CartDao;
+import com.example.bookstore_backend.dao.UserDao;
 import com.example.bookstore_backend.dto.CartBookDto;
+import com.example.bookstore_backend.dto.NewCartDto;
 import com.example.bookstore_backend.model.Book;
 import com.example.bookstore_backend.model.CartBook;
 import com.example.bookstore_backend.model.User;
@@ -11,57 +15,63 @@ import com.example.bookstore_backend.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class CartServiceImpl implements CartService {
-    CartbookRepository cartbookRepository;
-    UserRepository userRepository;
-    BookRepository bookRepository;
+    CartDao cartDao;
+    UserDao userDao;
+    BookDao bookDao;
     @Autowired
-    public CartServiceImpl(CartbookRepository cartbookRepository, UserRepository userRepository, BookRepository bookRepository){
-        this.bookRepository = bookRepository;
-        this.userRepository = userRepository;
-        this.cartbookRepository = cartbookRepository;
+    public CartServiceImpl(CartDao cartDao, UserDao userDao, BookDao bookDao){
+        this.bookDao = bookDao;
+        this.userDao = userDao;
+        this.cartDao = cartDao;
     }
     @Override
-    public Boolean AddCartItem(CartBook book) {
-        book.setSelected(false);
-        if(book.getNumber() == null) book.setNumber(1);
-        if(book.getSelected() == null) book.setSelected(false);
-        cartbookRepository.save(book);
-        return null;
-    }
+    public Boolean AddCartItem(NewCartDto dto, Long uid) {
+        if(dto.getNumbers() == null) dto.setNumbers(1);
+        User user = userDao.getUserByUid(uid).orElseThrow(()-> new NoSuchElementException("No target User"));
+        Book book = bookDao.getBookByBid(dto.getBid()).orElseThrow(()->new NoSuchElementException("No target Book"));
 
-    @Override
-    public Boolean updateCartItem(CartBook book) {
-        cartbookRepository.save(book);
+        CartBook cartBook = CartBook.builder()
+                .book(book)
+                .user(user)
+                .dateTime(LocalDateTime.now())
+                .number(dto.getNumbers())
+                .build();
+
+        cartDao.save(cartBook);
         return true;
     }
 
+
     @Override
     public List<CartBookDto> getCartItemByUid(Long uid) {
-        return cartbookRepository.getCartbookByUid(uid).stream().map(this::mapToCartDto).toList();
+
+        return cartDao.getCartBookByUid(uid).stream().map(this::mapToCartDto).toList();
     }
 
     @Override
     public Boolean deleteCartItem(Long cid) {
-        cartbookRepository.deleteCartBookByCid(cid);
+        cartDao.deleteCartBookByCid(cid);
         return true;
     }
 
     public CartBookDto mapToCartDto(CartBook cartBook){
 //        User user = userRepository.getUserByUid(cartBook.getUid()).get();
-        Book book = bookRepository.getBookByBid(cartBook.getBid()).get();
+        Book book = cartBook.getBook();
+        User user = cartBook.getUser();
         return CartBookDto.builder()
                 .price(book.getPrice())
-                .bid(cartBook.getBid())
+                .bid(book.getBid())
                 .pic(book.getPic())
                 .cid(cartBook.getCid())
                 .name(book.getName())
-                .uid(cartBook.getUid())
+                .uid(user.getUid())
                 .comment(book.getComment())
-                .selected(cartBook.getSelected())
                 .number(cartBook.getNumber())
                 .build();
     }
