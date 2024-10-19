@@ -10,11 +10,13 @@ import com.example.bookstore_backend.service.UserService;
 import com.example.bookstore_backend.service.impl.BookServiceImpl;
 import com.example.bookstore_backend.service.impl.CartServiceImpl;
 import com.example.bookstore_backend.service.impl.OrderServiceImpl;
+import com.example.bookstore_backend.util.KafkaProducer;
 import com.example.bookstore_backend.util.UserProvider;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,26 +27,27 @@ import java.util.*;
 @RestController
 @RequestMapping("/v1/order")
 public class OrderController {
+    @Autowired
     OrderService orderService;
+    @Autowired
     BookService bookService;
+    @Autowired
     CartService cartService;
+    @Autowired
     UserService userService;
     @Autowired
-    public OrderController(OrderService orderService, BookService bookService, CartService cartService, UserService userService){
-        this.orderService = orderService;
-        this.bookService = bookService;
-        this.cartService = cartService;
-        this.userService = userService;
-    }
+    KafkaProducer kafkaProducer;
 
-    @Transactional
     @PostMapping
     public ResponseDto<Boolean> addOrderItemInfo(@RequestBody OrderDto dto){
         Long uid = UserProvider.getUserUid();
+        String token = UserProvider.getToken();
+        dto.setToken(token);
         dto.setUid(uid);
         try{
-            orderService.AddOrder(dto);
-
+            System.out.println("Send an Order:" + dto);
+            kafkaProducer.send("orderTopic", null, dto);
+            //orderService.AddOrder(dto);
         }catch(NoSuchElementException e){
             return new ResponseDto<>(false, e.getLocalizedMessage(), false);
         }

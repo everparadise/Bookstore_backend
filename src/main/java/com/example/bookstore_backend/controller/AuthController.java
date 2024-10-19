@@ -2,19 +2,24 @@ package com.example.bookstore_backend.controller;
 
 import com.example.bookstore_backend.dto.AuthRequest;
 import com.example.bookstore_backend.model.AuthUser;
+import com.example.bookstore_backend.service.TimerService;
 import com.example.bookstore_backend.service.impl.AuthService;
 import com.example.bookstore_backend.dto.ResponseDto;
 import com.example.bookstore_backend.dto.UserDto;
 import com.example.bookstore_backend.util.JWTService;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.WebApplicationContext;
 
 
+import javax.swing.*;
 import java.util.Objects;
 
 @RestController
@@ -32,6 +37,8 @@ public class AuthController {
     @Autowired
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @PostMapping("/login")
     public ResponseDto<String> authenticate(
@@ -41,8 +48,10 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
         final AuthUser user = authService.loadUserByUsername(request.getUsername());
+        TimerService timerService = webApplicationContext.getBean(TimerService.class);
         if(user != null){
             String status = user.getStatus();
+            timerService.startTimer();
             return new ResponseDto<>(true, status, jwtService.generateToken(user));
         }
         return new ResponseDto<>(false, "username or password wrong", "wrong");
@@ -69,4 +78,14 @@ public class AuthController {
     return new ResponseDto<>(false, "should never reach here", "wrong");
     }
 
+    @GetMapping("/logout")
+    public ResponseDto<Long> logout(){
+        TimerService timerService = webApplicationContext.getBean(TimerService.class);
+        try{
+            Long duration = timerService.endTimer();
+            return new ResponseDto<>(true, "timer end success", duration);
+        }catch(RuntimeException runtimeException){
+            return new ResponseDto<>(false, "timer init error", null);
+        }
+    }
 }

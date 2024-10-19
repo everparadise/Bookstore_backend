@@ -46,4 +46,7 @@ public class User {
     @Column(nullable = false)
     @Email
     private String email;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserAuth userAuth;
 }

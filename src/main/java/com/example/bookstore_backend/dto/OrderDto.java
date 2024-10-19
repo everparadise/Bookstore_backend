@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,10 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 //used for receiving data from frontend
-public class OrderDto {
+public class OrderDto{
     private Long uid;
     private String address;
     private String telephone;
     private String receiver;
     private List<NewOrderItemDto> items;
+    private String token;
 }

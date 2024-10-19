@@ -56,5 +56,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "WHERE book.bid = :bid ")
     Integer updateBookInfo(Long bid, String name, String author, String pic, String isbn, Integer stock, String comment);
 
+    @Query("SELECT book.stock FROM Book book WHERE book.bid = :bid")
+    Integer getStockByBid(Long bid);
 
+    @Query("SELECT book.name FROM Book book WHERE book.bid = :bid")
+    String getNameByBid(Long bid);
 }

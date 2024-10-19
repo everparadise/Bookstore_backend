@@ -48,7 +48,7 @@ public class AuthService implements UserDetailsService {
 
     public UserDetails registerNewUser(AuthRequest auth){
         User newUser = User.builder()
-                .avatar("#")
+                .avatar("https://ui-avatars.com/api/?name=NewUser")
                 .remainMoney(1000000)
                 .password(auth.getPassword())
                 .username(auth.getUsername())

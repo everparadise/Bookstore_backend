@@ -56,7 +56,7 @@ public class SecurityConfig {
                 //管理session会话
                 // 无状态创建session 每个用户只能获得一个session否则阻止登录
             .sessionManagement(sessionManagement ->
-                    sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)  //session策略配置为无状态，意味着服务器不会创建session来存储认证信息 基于JWT的认证机制
+                    sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  //session策略配置为无状态，意味着服务器不会创建session来存储认证信息 基于JWT的认证机制
                                 .sessionFixation().migrateSession()
                                 .maximumSessions(1)   //每个用户限制最多拥有一个会话
                                 .maxSessionsPreventsLogin(true)) //达到会话上限之后阻止新会话

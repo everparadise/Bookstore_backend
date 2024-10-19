@@ -28,13 +28,14 @@ public class AuthProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authenticationToken)
             throws AuthenticationException {
-        String uid = String.valueOf(authenticationToken.getPrincipal());
+        String username = String.valueOf(authenticationToken.getPrincipal());
         String password = String.valueOf(authenticationToken.getCredentials());
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(uid);
+        //passwordEncoder.encode(userDetails.getPassword());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if (passwordEncoder.matches(password, userDetails.getPassword())) {
             /* password match */
-            return new UsernamePasswordAuthenticationToken(uid, password, userDetails.getAuthorities());
+            return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());
         }
 
         /* password mismatch */

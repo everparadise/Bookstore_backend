@@ -17,5 +17,10 @@ public final class UserProvider {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ((AuthUser)authentication.getPrincipal()).getUser().getRole();
     }
+    public static String getToken(){
+        getUserRole();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (String) authentication.getCredentials();
+    }
 
 }

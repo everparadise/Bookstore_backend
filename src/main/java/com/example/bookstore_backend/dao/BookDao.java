@@ -15,7 +15,7 @@ public interface BookDao {
     public Integer deleteBookByBid(Long bid);
     public void save(Book book);
     public Optional<Book> getBookByBid(Long bid);
-    public void modifyBookStock(Long bid, Integer decrease);
+    public void modifyBookStock(Long bid, Integer decrease) throws Exception;
     public Integer modifyBookPic(String pic, Long bid);
     public Integer modifyBookInfo(Long bid, String name, String author, String pic, String isbn, Integer stock, String comment);
 }

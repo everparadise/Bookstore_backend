@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public Order AddOrder(OrderDto dto) {
+    public Order AddOrder(OrderDto dto) throws Exception {
         User user = userDao.getUserByUid(dto.getUid()).get();
 
         //Order 总信息
@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
         Integer totalNumbers = 0;
         //Order Item信息
         for(NewOrderItemDto it: dto.getItems()){
-            Book book = bookDao.getBookByBid(it.getBid()).orElseThrow(()->new NoSuchElementException("No Target Book"));
+            Book book = bookDao.getBookByBid(it.getBid()).orElseThrow(()->new NoSuchElementException("No Target Book" ));
             OrderBook orderBook =OrderBook.builder()
                     .book(book)
                     .number(it.getNumbers())
@@ -96,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setItems(orderBookList);
         order.setTotalPrice(totalNumbers);
-        if(user.getRemainMoney() < totalNumbers) throw new RuntimeException("No Enough Money");
+        if(user.getRemainMoney() < totalNumbers) throw new RuntimeException("余额不足");
         userDao.decreaseMoney(user.getUid(), totalNumbers);
         orderDao.save(order);
         return order;

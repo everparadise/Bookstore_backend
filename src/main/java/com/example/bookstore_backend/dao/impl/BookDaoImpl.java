@@ -29,6 +29,7 @@ public class BookDaoImpl implements BookDao {
         return bookRepository.getExtendBooksByPageable(pageable, value);
     }
 
+
     @Override
     public Page<BookDto> getBooks(Integer page, String value) {
         Pageable pageable = PageRequest.of(page,  12, Sort.by(Sort.Direction.ASC, "bid"));
@@ -65,7 +66,9 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public void modifyBookStock(Long bid, Integer changing) {
+    public void modifyBookStock(Long bid, Integer changing) throws Exception {
+        Integer stock = bookRepository.getStockByBid(bid);
+        if(stock < changing) throw new Exception("目标书籍 \"" + bookRepository.getNameByBid(bid) + "\" 余量不足");
         bookRepository.modifyBookStock(bid, changing);
     }
 

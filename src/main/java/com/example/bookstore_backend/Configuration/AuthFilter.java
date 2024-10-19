@@ -52,16 +52,17 @@ public class AuthFilter extends OncePerRequestFilter {
         //从请求头中提取token
         jwtToken = authHeader.substring(7);
         username = jwtService.extractUsername(jwtToken);
-
+        System.out.println("filter authenticate");
         //检查上下文是否进行过验证
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if(jwtService.isTokenValid(jwtToken, userDetails)){
                 //用来更新上下文
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, jwtToken, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                System.out.println("security Context Holder set authenticate");
             }
         }
         //责任链模式，传入下一个过滤器
