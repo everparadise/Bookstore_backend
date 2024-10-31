@@ -6,6 +6,7 @@ import com.example.bookstore_backend.dto.*;
 import com.example.bookstore_backend.model.Book;
 import com.example.bookstore_backend.dao.OrderDao;
 import com.example.bookstore_backend.service.BookService;
+import com.example.bookstore_backend.util.CacheClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import java.util.Optional;
 public class BookServiceImpl implements BookService {
     BookDao bookDao;
     OrderDao orderDao;
+
+    CacheClient cacheClient;
     @Autowired
     public BookServiceImpl(BookDao bookDao, OrderDao orderDao){
         this.bookDao = bookDao;

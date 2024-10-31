@@ -47,11 +47,5 @@ public class Book {
     @Column(nullable = false)
     private String isbn;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<OrderBook> orders;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<CartBook> carts;
 }

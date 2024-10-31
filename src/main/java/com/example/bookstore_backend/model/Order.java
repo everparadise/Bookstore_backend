@@ -41,6 +41,8 @@ public class Order {
     private String receiver;
 
     @OneToMany(mappedBy = "order",orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    @ToString.Exclude
     List<OrderBook> items;
 
     @Column(name = "order_price", nullable = false)

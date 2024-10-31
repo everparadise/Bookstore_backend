@@ -2,10 +2,7 @@ package com.example.bookstore_backend.model;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -21,12 +18,14 @@ public class OrderBook{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long oid;
 
-    @JsonIgnore
+    @ToString.Exclude
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", referencedColumnName = "Oid")
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Book book;
 
     @Column(nullable = false)

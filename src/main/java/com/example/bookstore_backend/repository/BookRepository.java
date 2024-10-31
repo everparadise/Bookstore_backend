@@ -22,15 +22,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("SELECT COUNT(book) FROM Book book")
     public Integer getBooksPages();
-    @Query("SELECT new com.example.bookstore_backend.dto.ExtendBookDto(books.bid, books.pic, " +
-            "books.name,books.price, books.sales, books.author, books.isbn, books.stock, books.comment)" +
-            " FROM Book books WHERE books.name LIKE :value")
-    public Page<ExtendBookDto> getExtendBooksByPageable(Pageable pageable, String value);
+    @Query("SELECT books FROM Book books WHERE books.name LIKE :value")
+    public Page<Long> getExtendBooksByPageable(Pageable pageable, String value);
 
-    @Query("SELECT new com.example.bookstore_backend.dto.BookDto(books.bid, books.pic, " +
-            "books.name,books.price, books.sales)" +
-            " FROM Book books WHERE books.name LIKE :value")
-    public Page<BookDto> getBooksByPageable(Pageable pageable, String value);
+    @Query("SELECT books.bid FROM Book books WHERE books.name LIKE :value")
+    public Page<Long> getBooksByPageable(Pageable pageable, String value);
     @Modifying
     @Query("UPDATE Book book SET book.sales = book.sales + :increase WHERE book.bid = :bid")
     public Integer increaseBookSales(Long bid, Integer increase);
