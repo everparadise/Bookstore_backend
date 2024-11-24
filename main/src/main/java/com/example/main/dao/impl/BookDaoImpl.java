@@ -84,8 +84,9 @@ public class BookDaoImpl implements BookDao {
 
     @Override
     public Integer deleteBookByBid(Long bid) {
-        Integer res = bookRepository.deleteBookByBid(bid);
         cacheClient.safeDelete(RedisConstants.CACHE_BOOKS_BOOK_KEY_PREFIX + bid);
+        Integer res = bookRepository.deleteBookByBid(bid);
+
 
         try {
             Thread.sleep(500);  // 延时 0.5 s

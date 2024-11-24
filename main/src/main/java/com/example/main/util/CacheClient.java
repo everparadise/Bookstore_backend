@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
 @Slf4j
@@ -23,6 +25,9 @@ public class CacheClient {
 
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
+
+    private final AtomicLong lastCheckTime = new AtomicLong(0);
+    private final AtomicBoolean connected = new AtomicBoolean(true);
 
     /**
      * 包装后的删除缓存的函数，处理了可能的异常
@@ -131,11 +136,69 @@ public class CacheClient {
         }
     }
 
+//    public boolean isConnected() {
+//        System.out.println("check connection");
+//        try {
+//            if (stringRedisTemplate.getConnectionFactory() != null) {
+//                RedisConnection connection = stringRedisTemplate.getConnectionFactory().getConnection();
+//                System.out.println("connection: " + connection);
+//                return !connection.isClosed();
+//            }
+//        } catch (Exception e) {
+//            log.warn(e.getMessage());
+//        }
+//        return false;
+//    }
+
     public boolean isConnected() {
+        System.out.println("check connection: " + connected.get() + " " + (System.currentTimeMillis() - lastCheckTime.get()) + " " + RedisConstants.COOL_DOWN_TIME);
+        if(!connected.get() && System.currentTimeMillis() - lastCheckTime.get() > RedisConstants.COOL_DOWN_TIME) {
+            System.out.println("time to retry");
+            if(stringRedisTemplate.getConnectionFactory() != null){
+                try{
+                    RedisConnection connection = stringRedisTemplate.getConnectionFactory().getConnection();
+                    if(connection.ping() != null){
+                        connected.set(true);
+                        lastCheckTime.set(System.currentTimeMillis());
+                        System.out.println("retry success");
+                        return true;
+                    }
+                }catch(Exception e){
+                    lastCheckTime.set(System.currentTimeMillis());
+                    return false;
+                }
+            }
+            else {
+                lastCheckTime.set(System.currentTimeMillis());
+                return false;
+            }
+        }
+        else if(!connected.get()){
+            System.out.println("not time to retry");
+            return false;
+        }
         try {
             if (stringRedisTemplate.getConnectionFactory() != null) {
                 RedisConnection connection = stringRedisTemplate.getConnectionFactory().getConnection();
-                return !connection.isClosed();
+                try {
+                    // 执行PING命令检查连接是否真正活跃
+                    if(connection.ping() != null){
+                        lastCheckTime.set(System.currentTimeMillis());
+                        System.out.println("ping success");
+                        return true;
+                    }
+                    else {
+                        lastCheckTime.set(System.currentTimeMillis());
+                        System.out.println("set false1");
+                        connected.set(false);
+                    }
+                } catch (Exception e){
+                    // 关闭这个测试连接
+                    // connection.close();
+                    lastCheckTime.set(System.currentTimeMillis());
+                    System.out.println("set false2");
+                    connected.set(false);
+                }
             }
         } catch (Exception e) {
             log.warn(e.getMessage());

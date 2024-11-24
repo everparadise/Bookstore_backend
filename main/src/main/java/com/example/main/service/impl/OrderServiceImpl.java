@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
     BookDao bookDao;
     UserDao userDao;
     CartDao cartDao;
+    private final WebClient webClient = WebClient.builder().baseUrl("http://localhost:8083").build();
     @Autowired
     public OrderServiceImpl(OrderDao orderDao, BookDao bookDao, UserDao userDao, CartDao cartDao){
         this.orderDao = orderDao;

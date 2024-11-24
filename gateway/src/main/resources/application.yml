@@ -18,6 +18,7 @@ spring:
               - "DELETE"
               - "OPTIONS"
               - "HEAD"
+            allow-credentials: true
       routes:
         - id: author
           uri: lb://author

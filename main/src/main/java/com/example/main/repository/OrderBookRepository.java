@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 public interface OrderBookRepository extends JpaRepository<OrderBook, Long> {
     @Query("SELECT new com.example.main.dto.OrderBookDto(orderbooks.order.address, orderbooks.number, orderbooks.order.date, " +
             "orderbooks.order.user.username, orderbooks.book.pic,orderbooks.book.name, orderbooks.order.phone) " +
-            "FROM OrderBook orderbooks WHERE orderbooks.book.name LIKE :name AND orderbooks.order.date BETWEEN :beginTime AND :endTime" +
-            " AND (:uid = -1 OR orderbooks.order.user.uid = : uid)")
+            "FROM OrderBook orderbooks WHERE  orderbooks.order.date BETWEEN :beginTime AND :endTime" +
+            " AND (:uid = -1 OR orderbooks.order.user.uid = : uid) AND orderbooks.book.name LIKE :name")
     Page<OrderBookDto> findOrderBooksByBook_NameAndOrder_DateRange(String name, LocalDateTime beginTime, LocalDateTime endTime, Pageable pageable, Long uid);
 
     @Query("SELECT new com.example.main.dto.BookSalesDto(orderBook.book.bid, orderBook.book.name, orderBook.book.pic,orderBook.book.price,SUM(orderBook.number))" +

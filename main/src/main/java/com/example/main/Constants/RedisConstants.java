@@ -10,6 +10,7 @@ public class RedisConstants {
     public static final Long CACHE_VIEW_TTL = 30L;
     public static final String CACHE_EVENT_KEY = "cache:event:";
     public static final String CACHE_VIEW_KEY = "cache:view:";
+    public static final long COOL_DOWN_TIME = 10 * 1000;
     //    public static final Long abnormalEventUUID = -101L;
 //    public static final EventDto abnormalEventDto = EventDto.builder()
 //        .uuid(abnormalEventUUID)
