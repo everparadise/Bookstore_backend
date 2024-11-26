@@ -6,28 +6,40 @@ import com.example.main.dao.BookDao;
 import com.example.main.dto.BookDto;
 import com.example.main.dto.ExtendBookDto;
 import com.example.main.model.Book;
+import com.example.main.model.Tag;
+import com.example.main.repository.BookPicRepository;
 import com.example.main.repository.BookRepository;
+import com.example.main.repository.TagRepository;
 import com.example.main.util.CacheClient;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@EnableNeo4jRepositories
 public class BookDaoImpl implements BookDao {
     @Autowired
     BookRepository bookRepository;
     @Autowired
+    BookPicRepository bookPicRepository;
+    @Autowired
     StringRedisTemplate stringRedisTemplate;
     @Autowired
     CacheClient cacheClient;
+    @Autowired
+    TagRepository tagRepository;
 
     @Override
     public Page<ExtendBookDto> getExtendBooks(Integer page, String value) {
@@ -86,7 +98,7 @@ public class BookDaoImpl implements BookDao {
     public Integer deleteBookByBid(Long bid) {
         cacheClient.safeDelete(RedisConstants.CACHE_BOOKS_BOOK_KEY_PREFIX + bid);
         Integer res = bookRepository.deleteBookByBid(bid);
-
+        bookPicRepository.deleteBookPicByBid(bid);
 
         try {
             Thread.sleep(500);  // 延时 0.5 s
@@ -99,9 +111,8 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public void save(Book book) {
-        Book result = bookRepository.save(book);
-        cacheClient.setRedis(RedisConstants.CACHE_BOOKS_BOOK_KEY_PREFIX + result.getBid(), result, RedisConstants.CACHE_BOOK_TTL, TimeUnit.MINUTES);
+    public Book save(Book book) {
+        return bookRepository.save(book);
     }
 
     @Override
@@ -142,5 +153,22 @@ public class BookDaoImpl implements BookDao {
         Integer tmp = bookRepository.updateBookInfo(bid, name, author, pic, isbn, stock, comment);
         cacheClient.safeDelete(RedisConstants.CACHE_BOOKS_BOOK_KEY_PREFIX + bid);
         return tmp;
+    }
+
+    @Override
+    public List<String> getRelatedTags(String tagName) {
+         System.out.println("TagRepository is null: " + (tagRepository == null));
+         return tagRepository.findRelatedTags(tagName);
+    }
+
+    @Override
+    public Page<BookDto> getBooksByTag(Integer page, List<String> tags) {
+        System.out.println("getBooksByTag");
+        Pageable pageable = PageRequest.of(page,  12, Sort.by(Sort.Direction.ASC, "bid"));
+        Page<Long> bookIdPage = bookRepository.getBooksByPageableAndTags(pageable, tags);
+        return bookIdPage.map(bookId -> {
+            Optional<Book> opTarget = cacheClient.queryRedis(RedisConstants.CACHE_BOOKS_NUMBER_KEY_PREFIX, bookId, Book.class, bookRepository::getBookByBid, RedisConstants.CACHE_BOOK_TTL, TimeUnit.MINUTES);
+            return opTarget.map(BookDto::new).orElse(null);
+        });
     }
 }

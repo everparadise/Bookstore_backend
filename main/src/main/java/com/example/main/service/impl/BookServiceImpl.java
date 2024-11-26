@@ -7,6 +7,7 @@ import com.example.main.dto.BookDto;
 import com.example.main.dto.BookSalesDto;
 import com.example.main.dto.ExtendBookDto;
 import com.example.main.model.Book;
+import com.example.main.model.Tag;
 import com.example.main.service.BookService;
 import com.example.main.util.CacheClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void addBookInfo(Book book){
-        bookDao.save(book);
+    public Book addBookInfo(Book book){
+        return bookDao.save(book);
     }
 
 
@@ -89,6 +90,13 @@ public class BookServiceImpl implements BookService {
 
         Page<BookSalesDto> salesDto = orderDao.getBookByRangingAndUid(startTime, endTime, limit, uid);
         return salesDto.getContent();
+    }
+
+    @Override
+    public Page<BookDto> getBooksByTag(Integer page, String tag) {
+        List<String> tags = bookDao.getRelatedTags(tag);
+        tags.add(tag);
+        return bookDao.getBooksByTag(page,tags);
     }
 
     private static BookDto mapToBookDto(ExtendBookDto extendBook){

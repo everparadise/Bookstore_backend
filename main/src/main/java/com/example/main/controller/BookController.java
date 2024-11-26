@@ -57,11 +57,11 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseDto<Boolean> addBookInfo(@RequestBody Book book){
+    public ResponseDto<Book> addBookInfo(@RequestBody Book book){
         //根据isbn号去重
         book.setSales(0);
-        bookServiceImpl.addBookInfo(book);
-        return new ResponseDto<>(true, "Operation OK", true);
+        Book result = bookServiceImpl.addBookInfo(book);
+        return new ResponseDto<>(true, "Operation OK", result);
     }
 
     @PutMapping
@@ -83,5 +83,17 @@ public class BookController {
     public ResponseDto<Boolean> deleteBookByBid(@PathVariable Long bid){
         bookServiceImpl.deleteBookByBid(bid);
         return new ResponseDto<>(true, "Operation OK", true);
+    }
+
+    @PostMapping("tags")
+    public ResponseDto<SimplifiedPageDto<?>> getBooksByTag(@RequestBody BookRequest bookRequest){
+        String tag = bookRequest.getValue();
+        Integer page = bookRequest.getPage();
+        System.out.println("tag: " + tag + " page: " + page);
+        Page<?> pages = bookServiceImpl.getBooksByTag(page, tag);
+        return new ResponseDto<>(true, "Operation OK", new SimplifiedPageDto<>(
+                pages.getContent(),
+                pages.getTotalPages(),
+                (int) pages.getTotalElements()));
     }
 }

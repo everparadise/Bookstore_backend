@@ -26,8 +26,11 @@ public class AuthUser implements UserDetails {
     public AuthUser(User user){
         this.user = new AuthDao(user.getUsername(), user.getPassword(), user.getUid(), user.getRole());
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities(){
+        System.out.println("getAuthorities");
+        System.out.println("ROLE_"+user.getRole().toString());
         return Collections.singletonList(new PrivateGrantedAuthority("ROLE_"+user.getRole().toString()));
     }
 

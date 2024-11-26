@@ -15,7 +15,7 @@ public interface BookService {
     public Page<BookDto> getBooks(Integer page, String value);
     public Page<ExtendBookDto> getExtendBooks(Integer page, String value);
     public Integer getBooksPages();
-    public void addBookInfo(Book book);
+    public Book addBookInfo(Book book);
     public Optional<Book> getBookByBid(Long bid);
 //    public List<BookDto> getBooksByRanks(Integer number);
 //    public void increaseBookSales(Long bid, Integer increase);
@@ -23,4 +23,6 @@ public interface BookService {
     public Boolean modifyBookPic(String pic, Long bid);
     public Integer modifyBookInfo(ExtendBookDto dto);
     public List<BookSalesDto> getRanking(String startString, String endString, Integer limit, Long uid);
+
+    public Page<BookDto> getBooksByTag(Integer page, String tag);
 }

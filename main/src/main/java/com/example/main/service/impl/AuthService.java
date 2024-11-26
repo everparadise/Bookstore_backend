@@ -40,6 +40,7 @@ public class AuthService implements UserDetailsService {
     public AuthUser loadUserByUsername(String username) throws UsernameNotFoundException{
         Optional<AuthDao> res =  userRepository.getAuthUserByUsername(username);
         if(res.isPresent()){
+            System.out.println(res.get().getRole());
             return new AuthUser(res.get());
         }
         else throw new UsernameNotFoundException("No User was found");

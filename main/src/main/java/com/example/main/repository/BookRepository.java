@@ -7,8 +7,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import com.example.main.model.Tag;
 
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -17,7 +19,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("SELECT COUNT(book) FROM Book book")
     public Integer getBooksPages();
-    @Query("SELECT books FROM Book books WHERE books.name LIKE :value")
+    @Query("SELECT books.bid FROM Book books WHERE books.name LIKE :value")
     public Page<Long> getExtendBooksByPageable(Pageable pageable, String value);
 
     @Query("SELECT books.bid FROM Book books WHERE books.name LIKE :value")
@@ -52,4 +54,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("SELECT book.name FROM Book book WHERE book.bid = :bid")
     String getNameByBid(Long bid);
+
+    @Query("SELECT books.bid FROM Book books WHERE books.tag IN :tags")
+    public Page<Long> getBooksByPageableAndTags(Pageable pageable, List<String> tags);
 }
