@@ -171,4 +171,9 @@ public class BookDaoImpl implements BookDao {
             return opTarget.map(BookDto::new).orElse(null);
         });
     }
+
+    @Override
+    public Book getBookByName(String name) {
+        return bookRepository.getBookByName(name);
+    }
 }

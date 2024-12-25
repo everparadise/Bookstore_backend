@@ -99,6 +99,11 @@ public class BookServiceImpl implements BookService {
         return bookDao.getBooksByTag(page,tags);
     }
 
+    @Override
+    public Book getBookByName(String name) {
+        return bookDao.getBookByName(name);
+    }
+
     private static BookDto mapToBookDto(ExtendBookDto extendBook){
         return BookDto.builder()
                 .bid(extendBook.getBid())

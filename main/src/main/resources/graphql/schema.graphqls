@@ -1,0 +1,16 @@
+type Query{
+    getBookByName(name:String): Book
+}
+
+type Book{
+    bid: ID          # 图书的唯一标识符，非空
+    name: String    # 图书名称，非空
+    pic: String      # 图书图片，非空
+    comment: String   # 图书评论，可为空
+    author: String   # 作者，非空
+    price: Int       # 价格，非空
+    stock: Int        # 库存，可为空
+    tag: String       # 标签，可为空
+    sales: Int        # 销量，可为空
+    isbn: String
+}

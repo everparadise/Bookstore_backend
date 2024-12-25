@@ -1,0 +1,14 @@
+query bookByName{
+    getBookByName(name: "book-1"){
+        bid
+        name
+        pic
+        price
+        comment
+        author
+        stock
+        tag
+        sales
+        isbn
+    }
+}

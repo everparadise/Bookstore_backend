@@ -57,4 +57,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("SELECT books.bid FROM Book books WHERE books.tag IN :tags")
     public Page<Long> getBooksByPageableAndTags(Pageable pageable, List<String> tags);
+
+    @Query("SELECT book FROM Book book WHERE book.name = :name")
+    public Book getBookByName(String name);
 }

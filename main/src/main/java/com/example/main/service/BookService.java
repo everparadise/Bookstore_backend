@@ -25,4 +25,6 @@ public interface BookService {
     public List<BookSalesDto> getRanking(String startString, String endString, Integer limit, Long uid);
 
     public Page<BookDto> getBooksByTag(Integer page, String tag);
+
+    public Book getBookByName(String name);
 }

@@ -23,4 +23,5 @@ public interface BookDao {
 
     public List<String> getRelatedTags(String tagName);
     public Page<BookDto> getBooksByTag(Integer page, List<String> tags);
+    public Book getBookByName(String name);
 }
