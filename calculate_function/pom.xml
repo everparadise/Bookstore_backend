@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>CalculateFunction</artifactId>
+    <artifactId>calculate_function</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>CalculateFunction</name>
     <description>CalculateFunction</description>

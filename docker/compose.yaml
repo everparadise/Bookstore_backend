@@ -1,0 +1,53 @@
+services:
+  
+  mysql:
+    image: mysql:latest
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456zkx
+      MYSQL_DATABASE: bookstore_backend
+  
+  gateway:
+    image: gateway:0.0.1-SNAPSHOT
+    ports:
+      - 8080:8080
+    environment:
+      EUREKA_SERVER_URL: http://eureka:8761/eureka
+    depends_on:
+      - eureka
+  
+  eureka:
+    image: eureka:0.0.1-SNAPSHOT
+    ports:
+      - 8761:8761
+  
+  main:
+    image: main:0.0.1-SNAPSHOT
+    ports:
+      - 8081:8081
+    environment:
+      MYSQL_HOST: mysql
+      KAFKA_HOST: kafka
+      REDIS_HOST: host.docker.internal
+      EUREKA_HOST: eureka
+      MONGO_HOST: host.docker.internal
+      NEO4J_HOST: host.docker.internal
+    depends_on:
+      - mysql
+      - eureka
+      - kafka
+  calculate_function:
+    image: calculate_function:0.0.1-SNAPSHOT
+    ports:
+      - 8083:8083
+
+  kafka:
+    image: apache/kafka:latest
+    ports:
+      - 9092:9092
+
+volumes:
+  mysql-data:
