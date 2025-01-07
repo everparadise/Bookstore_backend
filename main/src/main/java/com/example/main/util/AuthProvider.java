@@ -31,6 +31,7 @@ public class AuthProvider implements AuthenticationProvider {
 
         //passwordEncoder.encode(userDetails.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        System.out.println("AuthProvider: " + userDetails.getPassword());
         if (passwordEncoder.matches(password, userDetails.getPassword())) {
             /* password match */
             return new UsernamePasswordAuthenticationToken(username, password, userDetails.getAuthorities());

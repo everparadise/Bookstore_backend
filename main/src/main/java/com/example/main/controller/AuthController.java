@@ -45,6 +45,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
         final AuthUser user = authService.loadUserByUsername(request.getUsername());
+        System.out.println(user.getUsername());
         TimerService timerService = webApplicationContext.getBean(TimerService.class);
         if(user != null){
             String status = user.getStatus();

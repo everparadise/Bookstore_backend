@@ -67,6 +67,7 @@ public class JWTService {
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ){
+        System.out.println("generate token: " + userDetails.getUsername());
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())

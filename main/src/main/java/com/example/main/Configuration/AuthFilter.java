@@ -56,7 +56,8 @@ public class AuthFilter extends OncePerRequestFilter {
         //检查上下文是否进行过验证
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
+            System.out.println("doInternal filter authenticate");
+            System.out.println(userDetails.getUsername());
             if(jwtService.isTokenValid(jwtToken, userDetails)){
                 //用来更新上下文
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, jwtToken, userDetails.getAuthorities());
