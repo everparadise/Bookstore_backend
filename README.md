@@ -4,7 +4,10 @@ This repository contains the backend implementation of a web bookstore applicati
 
 ---
 ## Architecture Diagram
-![Architecture Diagram](./architecture-diagram.png)
+<div align="center">
+  <img src="./architecture-diagram.png" alt="Architecture Diagram" width="40%"/>
+</div>
+
 ## Key Features
 
 ### 1. **User Authentication and Security**
